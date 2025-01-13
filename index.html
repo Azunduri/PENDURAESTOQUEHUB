@@ -13,6 +13,7 @@
             padding: 20px; /* Margem em torno do conteúdo */
             box-sizing: border-box;
         }
+        
 
         /* Estilo do cabeçalho e rodapé */
         header, footer {
@@ -342,7 +343,7 @@ ul.btn-adicionar li:before {
             <input type="number" class="quantidade-produto" value="1" oninput="atualizarValores(this)">
             <p><strong>Valor Bruto:</strong> R$ <span class="valor-bruto">0,00</span></p>
             <p><strong>Valor com Desconto (40%):</strong> R$ <span class="valor-desconto">0,00</span></p>
-            <p><strong>Disponibilidade:</strong> <span class="disponibilidade-produto">Não disponível</span></p>
+            <p><strong>Disponibilidade no hub:</strong> <span class="disponibilidade-produto"></span></p>
             <button type="button" class="delete-btn" onclick="removerCRUD(this)">🗑️</button>
         </div>
     </div>
@@ -418,12 +419,12 @@ ul.btn-adicionar li:before {
                 input.parentElement.querySelector('.nome-produto').innerText = 'Nome não disponível';
                 input.parentElement.querySelector('.valor-bruto').innerText = 'R$ 0,00';
                 input.parentElement.querySelector('.valor-desconto').innerText = 'R$ 0,00';
-                input.parentElement.querySelector('.disponibilidade-produto').innerText = 'Não disponível';
+                input.parentElement.querySelector('.disponibilidade-produto').innerText = '-';
             } else {
                 input.parentElement.querySelector('.nome-produto').innerText = data.nomeProduto || 'Nome não disponível';
                 input.parentElement.querySelector('.valor-bruto').innerText = formatarMoeda(data.valorBruto || 0);
                 input.parentElement.querySelector('.valor-desconto').innerText = formatarMoeda(data.valorDesconto || 0);
-                input.parentElement.querySelector('.disponibilidade-produto').innerText = data.disponibilidade || 'Não disponível';
+                input.parentElement.querySelector('.disponibilidade-produto').innerText = data.disponibilidade || ' - ';
 
                 atualizarValores(input.parentElement.querySelector('.quantidade-produto'));
                 atualizarTotais();
@@ -501,7 +502,7 @@ ul.btn-adicionar li:before {
             <input type="number" class="quantidade-produto" value="1" oninput="atualizarValores(this)">
             <p><strong>Valor Bruto:</strong> R$ <span class="valor-bruto">0,00</span></p>
             <p><strong>Valor com Desconto (40%):</strong> R$ <span class="valor-desconto">0,00</span></p>
-            <p><strong>Disponibilidade:</strong> <span class="disponibilidade-produto">Não disponível</span></p>
+            <p><strong>Disponibilidade no hub:</strong> <span class="disponibilidade-produto"></span></p>
             <button type="button" class="delete-btn" onclick="removerCRUD(this)">🗑️</button>
         `;
         crudContainer.appendChild(newCrudSection);
@@ -757,10 +758,10 @@ function gerarPDFDocumento(cpf, nome, loja, cargo, produtos, quantidade, totalDe
         doc.text("____________________________", (pageWidth - assinaturaWidth) / 2, linhaAssinaturaY);
         doc.text(`Assinatura: ${nome}`, (pageWidth - doc.getTextWidth(`Assinatura: ${nome}`)) / 2, linhaAssinaturaY + 5);
 
-// Data e horário específicos
-const dataEspecifica = new Date(2024, 0, 9, 10, 6, 22); // Mês é 0 porque janeiro é 0
-const dataFormatada = dataEspecifica.toLocaleString('pt-BR');
-doc.text(`Data e Horário: ${dataFormatada}`, 14, linhaAssinaturaY + 15);
+        // Data e horário atuais
+        const dataAtual = new Date();
+        const dataFormatada = dataAtual.toLocaleString('pt-BR');
+        doc.text(`Data e Horário: ${dataFormatada}`, 14, linhaAssinaturaY + 15);
 
         // Exibindo PDF
         const pdfOutput = doc.output('bloburl');
@@ -780,6 +781,33 @@ doc.text(`Data e Horário: ${dataFormatada}`, 14, linhaAssinaturaY + 15);
 function formatarReais(valor) {
     return valor.replace('.', ',');
 }
+
+    // Função para verificar a disponibilidade do formulário
+    function verificarDisponibilidadeFormulario() {
+        const dataAtual = new Date();
+        const diaAtual = dataAtual.getDate();
+
+        // Verificar se o dia atual está entre 15 e 20
+        if (diaAtual >= 25 && diaAtual <= 30) {
+            // Liberar a página para interação
+            document.getElementById('banner').style.display = 'none';  // Esconde o banner
+            document.body.style.pointerEvents = 'auto';  // Libera a interação na página
+        } else {
+            // Bloquear a página e exibir o banner
+            document.getElementById('banner').style.display = 'block';  // Exibe o banner
+            document.body.style.pointerEvents = 'none';  // Bloqueia a interação na página
+        }
+    }
+
+    // Chama a função quando a página for carregada
+    window.onload = verificarDisponibilidadeFormulario;
+</script>
+
+<!-- Banner informativo que será exibido quando o formulário estiver bloqueado -->
+<div id="banner" style="position: fixed; top: 0; left: 0; width: 100%; background-color: rgb(255, 73, 1); text-align: center; color: #fff; padding: 10px; font-size: 16px; font-weight: bold; display: none;">
+    O formulário de pendura estará disponível entre os dias 25 e 30 de cada mês. Por favor, aguarde.
+</div>
+
 </script>
 </body>
 </html>
