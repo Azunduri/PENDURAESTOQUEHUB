@@ -13,6 +13,7 @@
             padding: 20px; /* Margem em torno do conteúdo */
             box-sizing: border-box;
         }
+        
 
         /* Estilo do cabeçalho e rodapé */
         header, footer {
@@ -342,6 +343,7 @@ ul.btn-adicionar li:before {
             <input type="number" class="quantidade-produto" value="1" oninput="atualizarValores(this)">
             <p><strong>Valor Bruto:</strong> R$ <span class="valor-bruto">0,00</span></p>
             <p><strong>Valor com Desconto (40%):</strong> R$ <span class="valor-desconto">0,00</span></p>
+            <p><strong>Disponibilidade no hub:</strong> <span class="disponibilidade-produto"></span></p>
             <button type="button" class="delete-btn" onclick="removerCRUD(this)">🗑️</button>
         </div>
     </div>
@@ -403,11 +405,11 @@ ul.btn-adicionar li:before {
         }
     }
     let debounceTimeout;
-function buscarDadosProduto(input) {
+    async function buscarDadosProduto(input) {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(async function() {
         const codigoProduto = input.value.trim();  
-        const url = 'https://script.google.com/macros/s/AKfycbx8pW9UM8IpbrAfO_b-jwXmeHeTeXmAncqDVWG-O-8jK60rIP8WRFbgxDAXqBcit7pmpg/exec';
+        const url = 'https://script.google.com/macros/s/AKfycbxxBn7w7XWFjNJqXBIE1pQdb3ObuGp5UVjI2P4IlIBmuiyKsR3tHTvOE-p6noObe77z-g/exec';
 
         try {
             const response = await fetch(`${url}?codigo=${codigoProduto}`);
@@ -417,10 +419,12 @@ function buscarDadosProduto(input) {
                 input.parentElement.querySelector('.nome-produto').innerText = 'Nome não disponível';
                 input.parentElement.querySelector('.valor-bruto').innerText = 'R$ 0,00';
                 input.parentElement.querySelector('.valor-desconto').innerText = 'R$ 0,00';
+                input.parentElement.querySelector('.disponibilidade-produto').innerText = '-';
             } else {
                 input.parentElement.querySelector('.nome-produto').innerText = data.nomeProduto || 'Nome não disponível';
                 input.parentElement.querySelector('.valor-bruto').innerText = formatarMoeda(data.valorBruto || 0);
                 input.parentElement.querySelector('.valor-desconto').innerText = formatarMoeda(data.valorDesconto || 0);
+                input.parentElement.querySelector('.disponibilidade-produto').innerText = data.disponibilidade || ' - ';
 
                 atualizarValores(input.parentElement.querySelector('.quantidade-produto'));
                 atualizarTotais();
@@ -498,6 +502,7 @@ function buscarDadosProduto(input) {
             <input type="number" class="quantidade-produto" value="1" oninput="atualizarValores(this)">
             <p><strong>Valor Bruto:</strong> R$ <span class="valor-bruto">0,00</span></p>
             <p><strong>Valor com Desconto (40%):</strong> R$ <span class="valor-desconto">0,00</span></p>
+            <p><strong>Disponibilidade no hub:</strong> <span class="disponibilidade-produto"></span></p>
             <button type="button" class="delete-btn" onclick="removerCRUD(this)">🗑️</button>
         `;
         crudContainer.appendChild(newCrudSection);
@@ -702,6 +707,7 @@ function gerarPDFDocumento(cpf, nome, loja, cargo, produtos, quantidade, totalDe
         doc.text("Nome do Produto", 60, yOffset);
         doc.text("Quantidade", 120, yOffset);
 
+
         // Quebra de texto para "Valor com Desconto"
         const valorDescontoHeader = doc.splitTextToSize("Valor com Desconto", 30);
         valorDescontoHeader.forEach((linha, index) => {
@@ -775,13 +781,14 @@ function gerarPDFDocumento(cpf, nome, loja, cargo, produtos, quantidade, totalDe
 function formatarReais(valor) {
     return valor.replace('.', ',');
 }
+
     // Função para verificar a disponibilidade do formulário
     function verificarDisponibilidadeFormulario() {
         const dataAtual = new Date();
         const diaAtual = dataAtual.getDate();
 
         // Verificar se o dia atual está entre 15 e 20
-        if (diaAtual >= 20 && diaAtual <= 10) {
+        if (diaAtual >= 25 && diaAtual <= 30) {
             // Liberar a página para interação
             document.getElementById('banner').style.display = 'none';  // Esconde o banner
             document.body.style.pointerEvents = 'auto';  // Libera a interação na página
@@ -798,8 +805,9 @@ function formatarReais(valor) {
 
 <!-- Banner informativo que será exibido quando o formulário estiver bloqueado -->
 <div id="banner" style="position: fixed; top: 0; left: 0; width: 100%; background-color: rgb(255, 73, 1); text-align: center; color: #fff; padding: 10px; font-size: 16px; font-weight: bold; display: none;">
-    O formulário de pendura estará disponível a partir do dia 20. Por favor, aguarde.
+    O formulário de pendura estará disponível entre os dias 25 e 30 de cada mês. Por favor, aguarde.
 </div>
+
 </script>
 </body>
 </html>
