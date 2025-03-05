@@ -381,7 +381,7 @@ ul.btn-adicionar li:before {
 
     async function buscarDadosCPF() {
         const cpf = document.getElementById('cpf').value;
-        const url = 'https://script.google.com/macros/s/AKfycbzLyETixTNJ1wbGHTK9TLjK4olBBgEiQFd93IcHDr61WXslnDjG7YC4dKgcocjE0_t8TQ/exec'';
+        const url = 'https://script.google.com/macros/s/AKfycbzLyETixTNJ1wbGHTK9TLjK4olBBgEiQFd93IcHDr61WXslnDjG7YC4dKgcocjE0_t8TQ/exec';
         try {
             const response = await fetch(`${url}?cpf=${cpf}`);
             const data = await response.json();
